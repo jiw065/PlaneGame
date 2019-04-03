@@ -9,56 +9,73 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * 飞机游戏的主窗口
- * @author 高淇
+ * 
+ * @author Amber
  *
  */
 public class MyGameFrame  extends  Frame {
+		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	Plane plane = new Plane(Constant.PLANE_IMG,250,250);
+	ArrayList<Shell> shellList = new ArrayList<Shell>();
 	
-	Image   planeImg  = GameUtil.getImage("images/plane.png");
-	Image   bg  = GameUtil.getImage("images/bg.jpg");
-	
-	Plane   plane = new Plane(planeImg,250,250);
-	Shell[]   shells = new Shell[50];
-	
-	Explode   bao ;
+	Explode exp;
 	Date  startTime = new Date();
 	Date  endTime;
-	int period;   //游戏持续的时间
+	int playTime;   
 	
+	public void startOver() {
+		shellList = new ArrayList<Shell>();
+		startTime = new Date();
+		
+	}
+	
+	public void cleanUp() {
+		plane = new Plane(Constant.PLANE_IMG,250,250);
+		shellList.clear();
+		endTime =null;
+		playTime = 0;
+		exp = null;
+	}
 	@Override
-	public void paint(Graphics g) {		//自动被调用。  g相当于一只画笔
+	public void paint(Graphics g) {		
 		Color   c =  g.getColor();
-		g.drawImage(bg, 0, 0, null);
+		g.drawImage(Constant.BACKGROUND_IMG, 0, 0, null);
+		if(shellList.isEmpty()) {
+			g.setColor(Color.LIGHT_GRAY);
+			g.setFont(new Font("TimesRoman", Font.BOLD, 40));
+			g.drawString("GAME START", 100, 250);
+		}
+		plane.drawSelf(g); 
 		
-		plane.drawSelf(g);  //画飞机
-		
-		//画出所有的炮弹
-		for(int i=0;i<shells.length;i++){
-			shells[i].draw(g);
+		for(Shell s:shellList){
+			s.drawSelf(g);
 			
-			//飞机和炮弹的碰撞检测！！！
-			boolean  peng = shells[i].getRect().intersects(plane.getRect());
-			if(peng){
+			if(s.getRect().intersects(plane.getRect())){
 				plane.live = false;
-				if(bao ==null){
-					bao  = new Explode(plane.x, plane.y);
+				if(exp ==null){
+					exp  = new Explode(plane.x, plane.y);
 					
 					endTime = new Date();
-					period = (int)((endTime.getTime()-startTime.getTime())/1000);
+					playTime = (int)((endTime.getTime()-startTime.getTime())/1000);
 				}
-				bao.draw(g);
+				exp.draw(g);
 			}
 			
-			//计时功能，给出提示
 			if(!plane.live){
-				g.setColor(Color.red);
-				Font   f  =  new Font("宋体", Font.BOLD, 50);
+				g.setColor(Color.LIGHT_GRAY);
+				Font f = new Font("TimesRoman", Font.BOLD, 25);
 				g.setFont(f);
-				g.drawString("时间："+period+"秒", (int)plane.x, (int)plane.y);
+				g.drawString("You have played "+playTime+" seconds", 50, 250);
 			}
 			
 		}
@@ -67,12 +84,12 @@ public class MyGameFrame  extends  Frame {
 	}
 	
 	
-	//帮助我们反复的重画窗口！
+
 	class  PaintThread  extends  Thread  {
 		@Override
 		public void run() {
 			while(true){
-				repaint();		//重画
+				repaint();		
 				
 				try {
 					Thread.sleep(40);   	//1s=1000ms
@@ -84,30 +101,33 @@ public class MyGameFrame  extends  Frame {
 		
 	}
 	
-	//定义键盘监听的内部类
 	class   KeyMonitor extends  KeyAdapter  {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
 			plane.addDirection(e);
+			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+				cleanUp();
+			}
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
 			plane.minusDirection(e);
+			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+				startOver();
+			}
 		}
 		
 		
 	}
 	
 	
-	/**
-	 * 初始化窗口
-	 */
+	
 	public  void  launchFrame(){
-		this.setTitle("尚学堂学员_程序猿作品");
+		this.setTitle("Plane game practice");
 		this.setVisible(true);
-		this.setSize(Constant.GAME_WIDTH	, Constant.GAME_HEIGHT);
+		this.setSize(Constant.GAME_WIDTH, Constant.GAME_HEIGHT);
 		this.setLocation(300, 300);
 		
 		this.addWindowListener(new WindowAdapter() {
@@ -117,17 +137,28 @@ public class MyGameFrame  extends  Frame {
 			}
 		});
 		
-		new PaintThread().start();	//启动重画窗口的线程
-		addKeyListener(new KeyMonitor());   //给窗口增加键盘的监听
-		
-		
-		//初始化50个炮弹
-		for(int i=0;i<shells.length;i++){
-			shells[i] = new Shell();
-		}
+		new PaintThread().start();	
+		addKeyListener(new KeyMonitor());  
+		addShellList(); 
 		
 	}
 	
+	public void addShellList() {
+		Timer timer = new Timer();
+		TimerTask task = new TimerTask() {
+			
+			@Override
+			public void run() {
+				shellList.add(new Shell());
+				if(shellList.size() == 30) {
+					timer.cancel();
+				}
+				
+			}
+		};
+		timer.schedule(task, 1000L, 1000L);
+				
+	}
 	public static void main(String[] args) {
 		MyGameFrame  f = new MyGameFrame();
 		f.launchFrame();

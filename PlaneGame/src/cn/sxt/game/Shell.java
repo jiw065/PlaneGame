@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 /**
- * 炮弹类
- * @author 高淇
+ * 
+ * @author Amber
  *
  */
 public class Shell   extends  GameObject {
@@ -17,17 +17,19 @@ public class Shell   extends  GameObject {
 		y = 200;
 		width=10;
 		height = 10;
-		speed = 3;
+		speed = Constant.SHELL_SPEED;
 		degree = Math.random()*Math.PI*2;
 	}
 	
-	public  void   draw(Graphics  g){
+
+
+	@Override
+	public void drawSelf(Graphics g) {
 		Color   c =  g.getColor();
 		g.setColor(Color.YELLOW);
 		
 		g.fillOval((int)x,(int) y, width, height);
 		
-		//炮弹沿着任意角度去飞
 		x += speed*Math.cos(degree);
 		y += speed*Math.sin(degree);
 		
@@ -40,10 +42,9 @@ public class Shell   extends  GameObject {
 			degree  = - degree;
 		}
 		
-		
-		
-		
+			
 		g.setColor(c);
+		
 	}
 	
 }

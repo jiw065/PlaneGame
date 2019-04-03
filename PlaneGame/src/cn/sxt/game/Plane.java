@@ -37,13 +37,12 @@ public class Plane  extends GameObject {
 		this.img = img;
 		this.x = x;
 		this.y = y;
-		this.speed = 3;
+		this.speed = Constant.PLANE_SPEED;
 		this.width = img.getWidth(null) ;
 		this.height = img.getHeight(null);
 		
 	}
 	
-	//按下某个键，增加相应的方向
 	public  void   addDirection(KeyEvent  e){
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:
@@ -61,7 +60,6 @@ public class Plane  extends GameObject {
 		}
 	}
 	
-	//按下某个键，取消相应的方向
 		public  void   minusDirection(KeyEvent  e){
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:

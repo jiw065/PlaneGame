@@ -9,15 +9,13 @@ import java.awt.Rectangle;
  * @author 高淇
  *
  */
-public class GameObject {
+public abstract class GameObject {
 	  Image  img;
 	  double  x,y;
 	   int   speed;
 	  int  width, height;
 	
-	public  void  drawSelf(Graphics  g){
-		g.drawImage(img, (int)x,(int) y, null);
-	}
+	public abstract void  drawSelf(Graphics  g);
 
 	public GameObject(Image img, double x, double y, int speed, int width, int height) {
 		super();
@@ -39,10 +37,7 @@ public class GameObject {
 	public GameObject() {
 	}
 	
-	/**
-	 * 返回物体所在的矩形。便于后续的碰撞检测
-	 * @return
-	 */
+	
 	public  Rectangle   getRect(){
 		return  new Rectangle((int)x, (int)y, width, height);
 	}
