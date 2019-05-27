@@ -174,7 +174,7 @@ public class MyGameFrame  extends  Frame {
 	 
 	public void update(Graphics g) {
 	    if(offScreenImage == null)
-	        offScreenImage = this.createImage(Constant.GAME_WIDTH,Constant.GAME_HEIGHT);//这是游戏窗口的宽度和高度
+	        offScreenImage = this.createImage(Constant.GAME_WIDTH,Constant.GAME_HEIGHT);
 	     
 	    Graphics gOff = offScreenImage.getGraphics();
 	    paint(gOff);
